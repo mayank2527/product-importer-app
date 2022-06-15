@@ -1,8 +1,9 @@
+import requests
 import logging
 import pandas as pd
 from app.celery_app import celery
 
-from app.models.products import Product, ProductFile, ProductFileStatus
+from app.models.products import Product, ProductFile, ProductFileStatus, WebHook
 from app.utils import set_data_in_redis
 
 
@@ -63,3 +64,24 @@ def save_product_to_db(file_id: int):
         product_file.status = ProductFileStatus.ERROR
         product_file.save()
         logging.error(e)
+
+
+@celery.task()
+def call_webhooks(product: dict):
+    """
+    Task to call all the active webhooks on product create/update.
+    """
+    from app import app
+
+    app.app_context().push()
+    web_hooks = WebHook.query.filter(WebHook.is_active == True).all()
+    for web_hook in web_hooks:
+        url = web_hook.url
+        try:
+            requests.post(
+                url,
+                data=product,
+                headers={"Content-Type": "application/json"},
+            )
+        except Exception as e:
+            logging.error(f"Exception while calling {url}- {e}")

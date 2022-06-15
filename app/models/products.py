@@ -64,3 +64,11 @@ class WebHook(Base):
     name = db.Column(db.String(240))
     url = db.Column(db.String(240))
     is_active = db.Column(db.Boolean, default=True)
+
+    @property
+    def serialize(self):
+        return {
+            "name": self.name,
+            "url": self.url,
+            "is_active": self.is_active,
+        }

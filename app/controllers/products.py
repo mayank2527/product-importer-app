@@ -1,3 +1,4 @@
+import json
 import os
 import logging
 import werkzeug
@@ -6,8 +7,8 @@ from flask import make_response, jsonify, request
 from flask_api import status
 from flask_restful import Resource, reqparse
 
-from app.models.products import ProductFile, Product as ProductModel
-from app.tasks import save_product_to_db
+from app.models.products import ProductFile, Product as ProductModel, WebHook
+from app.tasks import call_webhooks, save_product_to_db
 from app.config import config_settings
 from app.utils import get_data_from_redis
 from app.models import db
@@ -80,10 +81,15 @@ class Product(Resource):
         POST products api to create new product.
         """
         body = request.json
-        obj = ProductModel(
-            sku=body["sku"], name=body["name"], description=body["description"]
-        )
+        sku = body["sku"]
+        product = ProductModel.query.filter(ProductModel.sku == sku).first()
+        if product:
+            return make_response(
+                f"SKU {sku} already exist.", status.HTTP_400_BAD_REQUEST
+            )
+        obj = ProductModel(sku=sku, name=body["name"], description=body["description"])
         obj.save()
+        call_webhooks.delay(obj.serialize)
         return make_response("Success", status.HTTP_201_CREATED)
 
     def put(self):
@@ -137,3 +143,23 @@ class ProductUploadStatus(Resource):
             )
 
         return make_response("File id not found", status.HTTP_404_NOT_FOUND)
+
+
+class ProductWebHook(Resource):
+    def get(self):
+        """
+        Get list of all webhooks.
+        """
+        web_hooks = WebHook.query.all()
+        return make_response(
+            jsonify([i.serialize for i in web_hooks]), status.HTTP_200_OK
+        )
+
+    def post(self):
+        """
+        API endpoint to create product create/update webhook.
+        """
+        body = request.json
+        obj = WebHook(name=body["name"], url=body["url"])
+        obj.save()
+        return make_response("Success", status.HTTP_201_CREATED)

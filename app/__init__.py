@@ -5,7 +5,12 @@ from flask_restful import Api
 
 from app.controllers.index import Index
 from app.config import config_settings
-from app.controllers.products import Product, ProductUpload, ProductUploadStatus
+from app.controllers.products import (
+    Product,
+    ProductUpload,
+    ProductUploadStatus,
+    ProductWebHook,
+)
 from app.models import db
 
 migrate = Migrate()
@@ -20,6 +25,7 @@ def create_app():
     api.add_resource(Product, "/products")
     api.add_resource(ProductUpload, "/product_upload")
     api.add_resource(ProductUploadStatus, "/upload_status/<int:file_id>")
+    api.add_resource(ProductWebHook, "/product_webhook")
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
