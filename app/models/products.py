@@ -21,11 +21,15 @@ class Base(db.Model):
         db.session.commit()
         return self
 
+    @classmethod
+    def get_by_pk(cls, pk: int):
+        return db.session.query(cls).get(pk)
+
 
 class ProductFile(Base):
     __tablename__ = "product_file"
 
-    file = db.Column(db.LargeBinary)
+    file_path = db.Column(db.String)
     status = db.Column(db.Enum(ProductFileStatus), default=ProductFileStatus.PENDING)
 
 
@@ -36,3 +40,19 @@ class Product(Base):
     sku = db.Column(db.String(240), unique=True, index=True)
     description = db.Column(db.Text, nullable=True)
     is_active = db.Column(db.Boolean, default=True)
+
+    @property
+    def serialize(self):
+        return {
+            "name": self.name,
+            "sku": self.sku,
+            "description": self.description,
+            "is_active": self.is_active,
+        }
+
+    def update_obj(self, data):
+        self.name = data.get("name", self.name)
+        self.description = data.get("description", self.description)
+        self.is_active = data.get("is_active", self.is_active)
+        db.session.commit()
+        return self
