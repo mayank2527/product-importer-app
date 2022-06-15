@@ -39,7 +39,16 @@ class ProductUpload(Resource):
         file_obj.save()
 
         save_product_to_db.delay(file_obj.id)
-        return make_response("success", status.HTTP_201_CREATED)
+        base_url = config_settings["development"].BASE_URL
+        return make_response(
+            jsonify(
+                {
+                    "msg": "Upload started successfully",
+                    "upload_status_url": f"{base_url}/upload_status/{file_obj.id}",
+                }
+            ),
+            status.HTTP_201_CREATED,
+        )
 
 
 class Product(Resource):

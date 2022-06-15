@@ -2,6 +2,8 @@ from typing import Any, Optional
 import pickle
 import redis
 
+DEFAULT_REDIS_CACHE_EXPIRY = 3600
+
 
 def set_data_in_redis(key: str, data) -> bool:
     """
@@ -9,7 +11,7 @@ def set_data_in_redis(key: str, data) -> bool:
     """
     redis_conn = redis.StrictRedis("redis")
     p_mydict = pickle.dumps(data)
-    redis_conn.set(key, p_mydict)
+    redis_conn.set(key, p_mydict, ex=DEFAULT_REDIS_CACHE_EXPIRY)
     return True
 
 

@@ -10,6 +10,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
+    BASE_URL = os.environ.get("BASE_URL")
 
 
 class CeleryConfig:

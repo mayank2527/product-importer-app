@@ -36,7 +36,7 @@ def save_product_to_db(file_id: int):
             set_data_in_redis(
                 f"product_{file_id}",
                 {
-                    "status": ProductFileStatus.PENDING,
+                    "status": ProductFileStatus.PENDING.value,
                     "inserted_rows": inserted_rows,
                     "total_rows": total_rows,
                 },
@@ -45,7 +45,7 @@ def save_product_to_db(file_id: int):
         set_data_in_redis(
             f"product_{file_id}",
             {
-                "status": ProductFileStatus.SUCCESS,
+                "status": ProductFileStatus.SUCCESS.value,
                 "inserted_rows": inserted_rows,
                 "total_rows": total_rows,
             },
@@ -56,7 +56,7 @@ def save_product_to_db(file_id: int):
         set_data_in_redis(
             f"product_{file_id}",
             {
-                "status": ProductFileStatus.ERROR,
+                "status": ProductFileStatus.ERROR.value,
                 "inserted_rows": inserted_rows,
                 "total_rows": total_rows,
             },
