@@ -21,7 +21,7 @@ logger = logging.getLogger("alembic.env")
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from app.models.products import Product, ProductFile
+from app.models.products import Product, ProductFile, WebHook
 
 config.set_main_option(
     "sqlalchemy.url",

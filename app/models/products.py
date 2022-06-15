@@ -56,3 +56,11 @@ class Product(Base):
         self.is_active = data.get("is_active", self.is_active)
         db.session.commit()
         return self
+
+
+class WebHook(Base):
+    __tablename__ = "product_webhook"
+
+    name = db.Column(db.String(240))
+    url = db.Column(db.String(240))
+    is_active = db.Column(db.Boolean, default=True)
