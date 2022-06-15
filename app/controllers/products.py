@@ -107,6 +107,7 @@ class Product(Resource):
                     "is_active": body["is_active"],
                 }
             )
+            call_webhooks.delay(product.serialize)
             return make_response("Product updated", status.HTTP_200_OK)
         else:
             return make_response("SKU not found", status.HTTP_404_NOT_FOUND)
