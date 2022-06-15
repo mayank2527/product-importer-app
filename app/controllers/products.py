@@ -1,4 +1,3 @@
-import json
 import os
 import logging
 import werkzeug
@@ -31,6 +30,8 @@ class ProductUpload(Resource):
         file_path = os.path.join(
             config_settings["file_upload_config"].FILE_UPLOAD_PATH, filename
         )
+        if not os.path.isdir(config_settings["file_upload_config"].FILE_UPLOAD_PATH):
+            os.mkdir(config_settings["file_upload_config"].FILE_UPLOAD_PATH)
 
         csv_file.save(file_path)
 
